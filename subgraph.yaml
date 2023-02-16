@@ -1,0 +1,119 @@
+specVersion: 0.0.5
+schema:
+  file: ./schema.graphql
+dataSources:
+  - kind: ethereum/contract
+    name: LSSVMPairFactory
+    network: mainnet
+    source:
+      address: "0xb16c1342E617A5B6E4b631EB114483FDB289c0A4"
+      abi: LSSVMPairFactory
+      startBlock: 14645793
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+        - BondingCurveStatusUpdate
+        - CallTargetStatusUpdate
+        - NFTDeposit
+        - NewPair
+        - OwnershipTransferred
+        - ProtocolFeeMultiplierUpdate
+        - ProtocolFeeRecipientUpdate
+        - RouterStatusUpdate
+        - TokenDeposit
+        - TokenDataForCollection
+        - Collection
+        - Pair
+        - Nft
+        - BondingCurve
+        - Token
+      abis:
+        - name: LSSVMPairFactory
+          file: ./abis/LSSVMPairFactory.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+        - name: ERC20SymbolBytes
+          file: ./abis/ERC20SymbolBytes.json
+        - name: ERC20NameBytes
+          file: ./abis/ERC20NameBytes.json
+      eventHandlers:
+        - event: BondingCurveStatusUpdate(address,bool)
+          handler: handleBondingCurveStatusUpdate
+        - event: CallTargetStatusUpdate(address,bool)
+          handler: handleCallTargetStatusUpdate
+        - event: OwnershipTransferred(indexed address,indexed address)
+          handler: handleOwnershipTransferred
+        - event: ProtocolFeeMultiplierUpdate(uint256)
+          handler: handleProtocolFeeMultiplierUpdate
+        - event: ProtocolFeeRecipientUpdate(address)
+          handler: handleProtocolFeeRecipientUpdate
+        - event: RouterStatusUpdate(address,bool)
+          handler: handleRouterStatusUpdate
+      #using call handlers because sudo events arent very descriptive and dont give enough info, revert to events once events are updated in contracts
+      callHandlers:
+        - function: createPairETH(address,address,address,uint8,uint128,uint96,uint128,uint256[])
+          handler: handleCreatePairETH
+        - function: createPairERC20((address,address,address,address,uint8,uint128,uint96,uint128,uint256[],uint256))
+          handler: handleCreatePairERC20
+        - function: depositNFTs(address,uint256[],address)
+          handler: handleNFTDeposit
+        - function: depositNFTs(address,uint256[],address)
+          handler: handleNFTDeposit
+        - function: depositERC20(address,address,uint256)
+          handler: handleTokenDeposit
+      file: ./src/lssvm-pair-factory.ts
+templates:
+  - kind: ethereum
+    name: LSSVMPairEnumerableETH
+    network: mainnet
+    source:
+      abi: LSSVMPairEnumerableETH
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+        - AssetRecipientChange
+        - DeltaUpdate
+        - FeeUpdate
+        - NFTWithdrawal
+        - OwnershipTransferred
+        - SpotPriceUpdate
+        - SwapNFTInPair
+        - SwapNFTOutPair
+        - TokenDeposit
+        - TokenWithdrawal
+        - Transfer
+      abis:
+        - name: LSSVMPairEnumerableETH
+          file: ./abis/LSSVMPairEnumerableETH.json
+      eventHandlers:
+        - event: AssetRecipientChange(address)
+          handler: handleAssetRecipientChange
+        - event: DeltaUpdate(uint128)
+          handler: handleDeltaUpdate
+        - event: FeeUpdate(uint96)
+          handler: handleFeeUpdate
+        # - event: NFTWithdrawal()
+        #   handler: handleNFTWithdrawal
+        - event: OwnershipTransferred(indexed address)
+          handler: handleOwnershipTransferred
+        - event: SpotPriceUpdate(uint128)
+          handler: handleSpotPriceUpdate
+        - event: TokenDeposit(uint256)
+          handler: handleTokenDeposit
+        - event: TokenWithdrawal(uint256)
+          handler: handleTokenWithdrawal
+      #using call handlers because sudo events arent very descriptive and dont give enough info, revert to events once events are updated in contracts
+      callHandlers:
+        - function: withdrawERC721(address,uint256[])
+          handler: handleNFTWithdrawal
+        - function: swapNFTsForToken(uint256[],uint256,address,bool,address)
+          handler: handleSwapNFTInPair
+        - function: swapTokenForAnyNFTs(uint256,uint256,address,bool,address)
+          handler: handleSwapNFTOutPair
+        - function: swapTokenForSpecificNFTs(uint256[],uint256,address,bool,address)
+          handler: handleSwapNFTOutPairSpecificNfts
+      file: ./src/lssvm-pair-enumerable-eth.ts
