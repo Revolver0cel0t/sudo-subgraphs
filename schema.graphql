@@ -1,0 +1,224 @@
+type BondingCurve @entity {
+  id: ID!
+  curve: String
+}
+
+type Nft @entity {
+  id: ID!
+  collection: Collection!
+  pair: Pair
+  tokenId: String
+}
+
+type Token @entity {
+  id: ID!
+  decimals: String
+  name: String
+  pairCount: BigInt
+  pairs: [Pair!]! @derivedFrom(field: "token")
+  symbol: String
+}
+
+type TokenDataForCollection @entity {
+  id: ID!
+  collection: Collection
+  token: Token
+  tokenBalance: BigInt
+}
+
+type Pair @entity {
+  id: ID!
+  owner: String
+  createdTx: String
+  createdAt: BigInt
+  updatedAt: BigInt
+  nft: String!
+  assetRecipient: String
+  poolType: BigInt
+  delta: BigInt
+  fee: BigInt!
+  spotPrice: BigInt
+  inventoryCount: BigInt!
+  nfts: [Nft!]! @derivedFrom(field: "pair")
+  collection: Collection
+  bondingCurve: BondingCurve
+  tokenBalance: BigInt!
+  token: Token
+}
+
+type Collection @entity {
+  id: ID!
+  ethBalance: BigInt
+  name: String
+  nftBalance: BigInt!
+  pairs: [Pair!]! @derivedFrom(field: "collection")
+  pairCount: BigInt
+  symbol: String
+  nfts: [Nft!]! @derivedFrom(field: "collection")
+  tokenData: [TokenDataForCollection!]! @derivedFrom(field: "collection")
+}
+
+type ETHPairPrices @entity {
+  id: ID!
+  nftContract: String
+  minSpotAsk: BigInt
+  maxSpotBid: BigInt
+}
+
+type DailyETHPoolStat @entity {
+  id: ID!
+  dayTimestamp: BigInt
+  dayString: String
+  nftContract: String
+  erc20Contract: String
+  numSwaps: BigInt
+  swapVolumeETH: BigInt
+  approxPoolFees: BigInt
+  approxProtocolFees: BigInt
+  approxPoolRevenue: BigInt
+  approxPoolSpent: BigInt
+  ethDeposited: BigInt
+  ethWithdrawn: BigInt
+  nftsDeposited: BigInt
+  nftsWithdrawn: BigInt
+  numBuys: BigInt
+  numSells: BigInt
+}
+
+type DailyETHPairStat @entity {
+  id: ID!
+  pair: String
+  dayTimestamp: BigInt
+  dayString: String
+  nftContract: String
+  erc20Contract: String
+  numSwaps: BigInt
+  swapVolumeETH: BigInt
+  approxPairFees: BigInt
+  approxProtocolFees: BigInt
+  approxPairRevenue: BigInt
+  approxPairSpent: BigInt
+  ethDeposited: BigInt
+  ethWithdrawn: BigInt
+  nftsDeposited: BigInt
+  nftsWithdrawn: BigInt
+  minSpotAsk: BigInt
+  maxSpotBid: BigInt
+  numBuys: BigInt
+  numSells: BigInt
+}
+
+type DailyETHProtocolStat @entity {
+  id: ID!
+  dayTimestamp: BigInt
+  dayString: String
+  numSwaps: BigInt
+  swapVolumeETH: BigInt
+  approxPoolFees: BigInt
+  approxProtocolFees: BigInt
+  approxPoolRevenue: BigInt
+  approxPoolSpent: BigInt
+  ethDeposited: BigInt
+  ethWithdrawn: BigInt
+  numPoolsCreated: BigInt
+  numPairsCreated: BigInt
+  nftsDeposited: BigInt
+  nftsWithdrawn: BigInt
+  numBuys: BigInt
+  numSells: BigInt
+}
+
+type BondingCurveStatusUpdate @entity {
+  id: ID!
+  allowed: String
+  address: String
+}
+
+type AssetRecipientChange @entity {
+  id: ID!
+  a: Bytes! # address
+  pair: String
+  timestamp: BigInt
+}
+
+type DeltaUpdate @entity {
+  id: ID!
+  newDelta: BigInt! # uint128
+  pair: String
+  timestamp: BigInt
+}
+
+type FeeUpdate @entity {
+  id: ID!
+  newFee: BigInt! # uint96
+  pair: String
+  timestamp: BigInt
+}
+
+type NFTWithdrawal @entity {
+  id: ID!
+  pair: String
+  timestamp: BigInt
+}
+
+type NFTDeposit @entity {
+  id: ID!
+  pair: String
+  timestamp: BigInt
+}
+
+type OwnershipTransferred @entity {
+  id: ID!
+  newOwner: Bytes! # address
+  pair: String
+  timestamp: BigInt
+}
+
+type SpotPriceUpdate @entity {
+  id: ID!
+  newSpotPrice: BigInt! # uint128
+  updateTx: String
+  nft: String
+  pair: String
+  blockNumber: BigInt
+  timestamp: BigInt
+}
+
+type ProtocolFeeMultiplier @entity {
+  id: ID!
+  protocolFeeMultiplier: BigDecimal!
+}
+
+type PoolNFTBuys @entity {
+  id: ID!
+  ethPaidByPool: BigInt!
+  pair: String!
+  fee: BigInt!
+  protocolFee: BigInt!
+  timestamp: BigInt!
+  nft: String!
+}
+
+type PoolNFTSales @entity {
+  id: ID!
+  ethReceivedByPool: BigInt!
+  pair: String!
+  fee: BigInt!
+  protocolFee: BigInt!
+  timestamp: BigInt!
+  nft: String!
+}
+
+type TokenDeposit @entity {
+  id: ID!
+  amountDeposited: BigInt! # uint256
+  pair: String
+  timestamp: BigInt
+}
+
+type TokenWithdrawal @entity {
+  id: ID!
+  amountWithdrawn: BigInt! # uint256
+  pair: String
+  timestamp: BigInt
+}
